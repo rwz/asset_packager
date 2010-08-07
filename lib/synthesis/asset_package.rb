@@ -1,7 +1,5 @@
 module Synthesis
   class AssetPackage
-    
-    GCC_URL = 'http://closure-compiler.appspot.com/compile'
 
     @asset_base_path    = "#{Rails.root}/public"
     @asset_packages_path = "#{Rails.root}/config/asset_packages.yml"
