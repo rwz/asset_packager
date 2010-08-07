@@ -1,18 +1,29 @@
 module Synthesis
   class AssetPackage
+    
+    GCC_URL = 'http://closure-compiler.appspot.com/compile'
 
     @asset_base_path    = "#{Rails.root}/public"
-    @asset_packages_yml = File.exists?("#{Rails.root}/config/asset_packages.yml") ? YAML.load_file("#{Rails.root}/config/asset_packages.yml") : nil
+    @asset_packages_path = "#{Rails.root}/config/asset_packages.yml"
   
     # singleton methods
     class << self
       attr_accessor :asset_base_path,
-                    :asset_packages_yml
+                    :asset_packages_path
 
-      attr_writer   :merge_environments
+      attr_writer   :merge_environments,
+                    :asset_packages_yml
       
       def merge_environments
         @merge_environments ||= ["production"]
+      end
+      
+      def asset_packages_yml
+        asset_packages_yml ||= File.exists?(@asset_packages_path) ? YAML.load_file(@asset_packages_path) : nil
+      end
+      
+      def reload_yml!
+        asset_packages_yml = nil
       end
       
       def parse_path(path)
@@ -151,7 +162,7 @@ module Synthesis
           when "stylesheets" then compress_css(merged_file)
         end
       end
-
+      
       def compress_js(source)
         jsmin_path = "#{Rails.root}/vendor/plugins/asset_packager/lib"
         tmp_path = "#{Rails.root}/tmp/#{@target}_packaged"

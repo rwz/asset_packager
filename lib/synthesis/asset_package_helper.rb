@@ -4,6 +4,10 @@ module Synthesis
     def should_merge?
       AssetPackage.merge_environments.include?(Rails.env)
     end
+    
+    def reload_yml!
+      AssetPackage.reload_yml! unless should_merge?
+    end
 
     def javascript_include_merged(*sources)
       options = sources.last.is_a?(Hash) ? sources.pop.stringify_keys : { }
@@ -15,8 +19,8 @@ module Synthesis
           sources[(sources.index(:defaults) + 1)..sources.length]
         sources.delete(:defaults)
       end
-
-      sources.collect!{|s| s.to_s}
+      reload_yml!
+      sources.collect!{|s| s.to_s }
       sources = (should_merge? ? 
         AssetPackage.targets_from_sources("javascripts", sources) : 
         AssetPackage.sources_from_targets("javascripts", sources))
@@ -26,8 +30,8 @@ module Synthesis
 
     def stylesheet_link_merged(*sources)
       options = sources.last.is_a?(Hash) ? sources.pop.stringify_keys : { }
-
-      sources.collect!{|s| s.to_s}
+      reload_yml!
+      sources.collect!{|s| s.to_s }
       sources = (should_merge? ? 
         AssetPackage.targets_from_sources("stylesheets", sources) : 
         AssetPackage.sources_from_targets("stylesheets", sources))
